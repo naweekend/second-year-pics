@@ -1,0 +1,323 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
+
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "../images/*.{jpg,jpeg,png,webp}",
+);
+
+const bonusImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../bonus_images/*.{jpg,jpeg,png,webp}",
+);
+
+const pfps = import.meta.glob<{ default: ImageMetadata }>(
+  "../pfps/*.{jpg,jpeg,png,webp}",
+);
+
+const pfpImages = await Promise.all(
+  Object.values(pfps).map(async (image) => {
+    const { default: imageData } = await image();
+    return imageData;
+  }),
+);
+---
+
+<BaseLayout
+  title="Astro Photo Grid"
+  description="A minimal, single-page photo gallery for Astro."
+>
+  <div
+    class="sm:px-10 px-5 flex justify-center items-center flex-col md:gap-5 pb-5 sm:pt-14 pt-10 max-md:text-center"
+  >
+    <h1
+      class="md:text-6xl text-5xl font-bold pb-3 w-full"
+      style="font-family: 'Serif', serif;"
+    >
+      Second Year Memories
+    </h1>
+    <p class="w-full text-balance">
+      incase this website doesnt work, try this link:
+    </p>
+    <a
+      id="alternate-link"
+      target="_blank"
+      class="w-full underline text-blue-300"></a>
+  </div>
+
+  <!-- contributors -->
+  <section class="relative overflow-hidden">
+    <h2 class="mb-8 text-center text-[2rem] font-bold"></h2>
+    <p class="sm:px-10 px-5 max-sm:text-center w-full text-balance pb-2">
+      thanks alot to everyone who contributed ~ 💖
+    </p>
+    <div
+      class="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)] sm:pt-4 pt-2 sm:pb-3 pb-4"
+      data-marquee
+    >
+      <div class="flex w-max gap-6 [animation:marquee_35s_linear_infinite]">
+        {/* First copy */}
+        {
+          pfpImages.map((image) => (
+            <div
+              class="shrink-0 grayscale opacity-50 transition duration-300"
+              data-avatar
+            >
+              <img
+                src={image.src}
+                width="90"
+                height="90"
+                loading="lazy"
+                alt=""
+                class="h-[90px] w-[90px] rounded-full border-[3px] border-white/15 object-cover"
+              />
+            </div>
+          ))
+        }
+
+        {/* Duplicate copy for seamless looping */}
+        {
+          pfpImages.map((image) => (
+            <div
+              class="shrink-0 grayscale opacity-50 transition duration-300"
+              data-avatar
+            >
+              <img
+                src={image.src}
+                width="90"
+                height="90"
+                loading="lazy"
+                alt=""
+                class="h-[90px] w-[90px] rounded-full border-[3px] border-white/15 object-cover"
+              />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- main images -->
+  <section class="justified-gallery" id="photoswipe">
+    {
+      Object.entries(images).map(async ([_path, image], index) => {
+        const { default: imageData } = await image();
+        return (
+          <a
+            style={`--width: ${imageData.width}; --height: ${imageData.height};`}
+            href={imageData.src}
+            target="_blank"
+            data-fancybox="gallery"
+          >
+            <Image
+              format="webp"
+              src={imageData}
+              alt=""
+              height={400}
+              loading={index < 20 ? "eager" : "lazy"}
+            />
+          </a>
+        );
+      })
+    }
+  </section>
+
+  <div
+    class="sm:px-10 px-5 flex justify-center items-center flex-col md:gap-5 gap-1 pb-5 sm:pt-14 pt-10 text-left"
+  >
+    <h1 class="sm:text-3xl text-xl font-bold w-full">
+      Bonus images ~ shoutout <a
+        target="_blank"
+        class="underline"
+        href="https://instagram.com/ig.itsrayan">rayan</a
+      >
+    </h1>
+  </div>
+
+  <!-- bonus images -->
+  <section class="justified-gallery" id="photoswipe">
+    {
+      Object.entries(bonusImages).map(async ([_path, image], index) => {
+        const { default: imageData } = await image();
+        return (
+          <a
+            style={`--width: ${imageData.width}; --height: ${imageData.height};`}
+            href={imageData.src}
+            target="_blank"
+            data-fancybox="gallery"
+          >
+            <Image
+              format="webp"
+              src={imageData}
+              alt=""
+              height={400}
+              loading={"lazy"}
+            />
+          </a>
+        );
+      })
+    }
+  </section>
+
+  <!-- footer -->
+  <footer class="py-5 px-5 flex justify-center items-center">
+    <h1>
+      made with 💖 by <a
+        href="https://instagram.com/nabeelv7i"
+        class="underline">nabeel</a
+      >
+    </h1>
+  </footer>
+</BaseLayout>
+
+<script>
+  import { Fancybox } from "@fancyapps/ui/dist/fancybox/";
+
+  Fancybox.bind("[data-fancybox]", {
+    theme: "auto",
+    mainStyle: {
+      "--f-button-width": "44px",
+      "--f-button-height": "44px",
+      "--f-button-border-radius": "50%",
+      "--f-toolbar-padding": "16px",
+    },
+    Carousel: {
+      Arrows: false,
+      Toolbar: {
+        display: {
+          left: [],
+          middle: [],
+          right: ["close"],
+        },
+      },
+      transition: "slide",
+    },
+  });
+</script>
+
+<script>
+  const link = document.getElementById("alternate-link");
+
+  const hostname = window.location.hostname;
+
+  let alternateUrl;
+
+  if (hostname.includes(".netlify.app")) {
+    alternateUrl = "https://secondyearpics.vercel.app";
+  } else if (hostname.includes(".vercel.app")) {
+    alternateUrl = "https://secondyearpics.netlify.app";
+  } else {
+    // custom domain or localhost
+    alternateUrl = "https://secondyearpics.netlify.app";
+  }
+
+  link.href = alternateUrl;
+  link.textContent = alternateUrl;
+</script>
+
+<script>
+  // Continuously saturates the contributor avatars based on how close they
+  // are to the visual center of the marquee, and desaturates them toward
+  // the edges. Recalculated every frame so it tracks the avatars as they
+  // actually scroll, instead of a fixed set of "center" elements.
+  const marquee = document.querySelector("[data-marquee]");
+  const avatars = Array.from(document.querySelectorAll("[data-avatar]"));
+
+  if (marquee && avatars.length > 0) {
+    // Avatars within FOCUS_RADIUS px of dead-center are fully saturated.
+    // Beyond that they fade to full grayscale over the next FALLOFF px.
+    // Tune these two numbers to make the "spotlight" wider or narrower.
+    const FOCUS_RADIUS = 70;
+    const FALLOFF = 220;
+
+    const tick = () => {
+      const marqueeRect = marquee.getBoundingClientRect();
+      const centerX = marqueeRect.left + marqueeRect.width / 2;
+
+      // Read every avatar's position first, then write styles after, so we
+      // never force a layout recalculation mid-loop.
+      const factors = avatars.map((avatar) => {
+        const rect = avatar.getBoundingClientRect();
+        const avatarCenterX = rect.left + rect.width / 2;
+        const distance = Math.abs(avatarCenterX - centerX);
+
+        if (distance <= FOCUS_RADIUS) return 1; // fully saturated
+        if (distance >= FOCUS_RADIUS + FALLOFF) return 0; // fully grayscale
+        return 1 - (distance - FOCUS_RADIUS) / FALLOFF; // interpolate between
+      });
+
+      avatars.forEach((avatar, i) => {
+        const f = factors[i];
+
+        avatar.style.filter = `saturate(${f * 100}%)`; // 100% center -> 0% away from it
+        avatar.style.opacity = String(0.5 + f * 0.5); // 1 center -> 0.5 away from it
+        avatar.style.transform = `scale(${0.85 + f * 0.3})`; // 1.15 center -> 0.85 away from it
+      });
+
+      requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(tick);
+  }
+</script>
+
+<style>
+  .justified-gallery {
+    --padding: max(2.5vw, 12px);
+    --space: max(2.5vw, 12px);
+    --min-height: clamp(200px, 20vw, 400px);
+
+    padding: var(--padding);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space);
+
+    a {
+      flex-grow: calc(var(--width) * (100000 / var(--height)));
+      flex-basis: calc(var(--min-height) * (var(--width) / var(--height)));
+      aspect-ratio: var(--width) / var(--height);
+      overflow: hidden;
+      opacity: 1;
+      transition: all 0.05s ease-in-out;
+    }
+
+    a img {
+      display: block;
+      object-fit: cover;
+      height: 100%;
+      width: 100%;
+    }
+
+    a:focus-visible {
+      outline: 3px solid var(--outline);
+      outline-offset: 2px;
+      transform: scale(1.05);
+      z-index: 1;
+      border-radius: 2px;
+      box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    a.hidden {
+      transition: opacity 0.4s ease-in-out;
+      opacity: 0;
+    }
+
+    &::after {
+      content: " ";
+      flex-grow: 1000000000;
+    }
+  }
+
+  /* Tailwind can express utility classes but not @keyframes itself, so this
+     stays as plain CSS. Referenced via the arbitrary `[animation:...]`
+     utility on the marquee track above. */
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>
