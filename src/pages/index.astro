@@ -211,7 +211,9 @@ const pfpImages = await Promise.all(
     alternateUrl = "https://secondyearpics.netlify.app";
   }
 
+  // @ts-ignore
   link.href = alternateUrl;
+  // @ts-ignore
   link.textContent = alternateUrl;
 </script>
 
@@ -249,8 +251,11 @@ const pfpImages = await Promise.all(
       avatars.forEach((avatar, i) => {
         const f = factors[i];
 
+        // @ts-ignore
         avatar.style.filter = `saturate(${f * 100}%)`; // 100% center -> 0% away from it
+        // @ts-ignore
         avatar.style.opacity = String(0.5 + f * 0.5); // 1 center -> 0.5 away from it
+        // @ts-ignore
         avatar.style.transform = `scale(${0.85 + f * 0.3})`; // 1.15 center -> 0.85 away from it
       });
 

@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://mysite.com",
+  site: "https://secondyearpics.vercel.app",
   devToolbar: {
     enabled: false,
   },
